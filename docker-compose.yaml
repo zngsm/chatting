@@ -1,0 +1,23 @@
+version: '3'
+services:
+  db:
+    image: mysql:8.0
+    container_name: "chat_db"
+    restart: always
+    ports:
+      - 3306:3306
+    environment:
+      MYSQL_DATABASE: "chat"
+      MYSQL_ROOT_PASSWORD: "1234"
+      TZ: Asia/Seoul
+    volumes:
+      - db-data:/var/lib/mysql
+
+  redis:
+    image: redis
+    container_name: "chat_redis"
+    restart: always
+    ports:
+      - 6379:6379
+volumes:
+  db-data:

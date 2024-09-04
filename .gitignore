@@ -1,0 +1,5 @@
+venv/
+chatting/__pycache__/
+db.sqlite3
+.idea/
+**/__pycache__/
