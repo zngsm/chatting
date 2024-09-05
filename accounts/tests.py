@@ -3,8 +3,8 @@ from django.test import TestCase
 from rest_framework import status
 from rest_framework.test import APIClient
 
-
 User = get_user_model()
+
 
 # Create your tests here.
 class TestUser(TestCase):

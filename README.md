@@ -3,12 +3,10 @@
 > 실시간 채팅 서비스
 
 
-
 - python 3.12
 - django (django-rest-framework)
-- channel
-
-
+- django channel (with Redis)
+- mygsql
 
 
 
@@ -25,122 +23,71 @@ $ pip install -r requirements.txt
 $ docker-compose up -d
 
 # start
+# 처음 서버 구동시 마이그레이션 과정이 필요합니다.
 $ python manage.py migrate
 
+# 서버 on
 $ python manage.py runserver
 ```
 
 
+## 주요 기능
 
+### HTTP
 
-
-## ERD
-
-
-
-
-
-
-
-## API
-
-- 유저 생성 API
-  - POST /user
+- 유저 생성
+  - POST /accounts
   - ```json
     // body
     {
-        "name": "유저 고유 식별 정보",
+        "username": "유저 고유 식별 정보",
+        "password": "비밀번호",
     }
     ```
+- 로그인 API
+  - POST /accounts/login
+  - ```json
+    // body
+    {
+        "username": "유저 고유 식별 정보",
+        "password": "비밀번호",
+    }
+  ```
 
-- 채팅방 생성 API
-
+- 채팅방 개설
   - POST /chat
-
   - ```json
     // body
     {
-        "user_name": "유저 고유식별정보",
-        "title": "채팅방 제목",
+      "name": "채팅방 이름",
     }
-    ```
+  ```
 
-    - 방장의 개념은 없기 때문에, 생성한 유저도 유저리스트의 일부로 들어간다.
 
-- 채팅방 조회 API
+### SOCKET
 
-  - GET /chat
+- 채팅방 목록
+  - /room/
 
-  - ```json
-    // Response
-    {
-        "results": [
-            {"id": "채팅방 아이디", "title": "채팅방 제목", "user_count": "30분간 유저 카운트"},
-            {"id": "채팅방 아이디", "title": "채팅방 제목", "user_count": "30분간 유저 카운트"},
-            {"id": "채팅방 아이디", "title": "채팅방 제목", "user_count": "30분간 유저 카운트"},
-            ...
-        ]
-    }
-    ```
+- 채팅
+  - /room/{room_id}/chat/
 
-    - 채팅방 제목이 unique 하지 않기 때문에 제목을 같이 넣어준다.
 
-- 실시간 채팅 API
+## 참고사항
+- 유저는 굳이 생성하지 않아도 됩니다.(채팅방 입장시 랜덤 유저 생성)
 
-  - POST /chat/{room_id}
 
-  - ```json
-    // body
-    {
-        "user_name": "유저 고유 식별 정보",
-        "content": "채팅 내용",
-    }
-    ```
+## Code guide
+- /accounts : 유저 앱
+  - /models.py : 유저 모델 생성
+  - /urls.py : 유저 API path
+  - /views.py : 유저 API 로직
+  - /tests.py : 유저 API 테스트
 
-- 채팅 목록 조회 API
-
-  - GET  /chat/{room_id}
-
-  - ```json
-    {
-        "results": [
-            {"user_name": "유저 정보", "content": "채팅 내용", "created_at": "작성 일시"},
-            {"user_name": "유저 정보", "content": "채팅 내용", "created_at": "작성 일시"},
-            {"user_name": "유저 정보", "content": "채팅 내용", "created_at": "작성 일시"},
-            ....
-        ]
-    }
-    ```
-
-    - 가장 최근 메시지가 노출되어야한다.
-    - 채팅참여자는 모든 메시지와 새로운 메시지를 볼 수 있다.
-
-- 채팅방 입장 API
-  - POST /chat/{room_id}
-
-  - ```json
-    // body
-    {
-        "user_name": "유저 고유 식별 정보"
-    }
-    ```
-    
-- 채팅방 퇴장 API
-  - PUT /chat/{room_id}
-
-  - ```json
-    // body
-    {
-        "user_name": "유저 고유 식별 정보"
-    }
-    ```
-
-- 채팅방 정보 API (optional)
-  - GET /chat/{room_id}/info
-  
-  - ```json
-    {
-        "user_list": [],
-        "user_count_in_30_min": 0
-    }
-    ```
+- /chat : 채팅 앱
+  - /models.py : 채팅 관련 모델 생성
+  - /urls.py : 채팅 HTTP API path
+  - /views.py : 채팅 API 로직
+  - /tests.py : 채팅 API 테스트 + 채팅 테스트
+  - /routing.py : 채팅 관련 소켓 라우팅
+  - /consumers.py : 채팅 관련 소켓 로직
