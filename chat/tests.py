@@ -319,7 +319,7 @@ class TestChatRoomInfo(TestSocket):
                 "chatroom_id": chatroom.id,
                 "name": chatroom.name,
                 "visitor_count": 0,
-                "lastest_message": {
+                "latest_message": {
                     "message": message2.content,
                     "username": user.username,
                 },
@@ -384,7 +384,7 @@ class TestChatRoomInfo(TestSocket):
                 "chatroom_id": chatroom1.id,
                 "name": chatroom1.name,
                 "visitor_count": 3,
-                "lastest_message": {
+                "latest_message": {
                     "message": msg_1.content,
                     "username": user3.username,
                 },
@@ -393,7 +393,7 @@ class TestChatRoomInfo(TestSocket):
                 "chatroom_id": chatroom3.id,
                 "name": chatroom3.name,
                 "visitor_count": 2,
-                "lastest_message": {
+                "latest_message": {
                     "message": msg_3.content,
                     "username": user3.username,
                 },
@@ -402,7 +402,7 @@ class TestChatRoomInfo(TestSocket):
                 "chatroom_id": chatroom2.id,
                 "name": chatroom2.name,
                 "visitor_count": 1,
-                "lastest_message": {
+                "latest_message": {
                     "message": msg_2.content,
                     "username": user4.username,
                 },
@@ -411,7 +411,7 @@ class TestChatRoomInfo(TestSocket):
                 "chatroom_id": chatroom4.id,
                 "name": chatroom4.name,
                 "visitor_count": 0,
-                "lastest_message": {"message": NO_MSG, "username": SYSTEM},
+                "latest_message": {"message": NO_MSG, "username": SYSTEM},
             },
         }
 
@@ -434,7 +434,7 @@ class TestChatRoomInfo(TestSocket):
                 "chatroom_id": chatroom.id,
                 "name": chatroom.name,
                 "visitor_count": 0,
-                "lastest_message": {
+                "latest_message": {
                     "message": message1.content,
                     "username": user.username,
                 },

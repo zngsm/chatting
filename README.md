@@ -52,8 +52,9 @@ $ python manage.py runserver
         "username": "유저 고유 식별 정보",
         "password": "비밀번호",
     }
-  ```
-
+  
+  
+  
 - 채팅방 개설
   - POST /chat
   - ```json
@@ -61,7 +62,8 @@ $ python manage.py runserver
     {
       "name": "채팅방 이름",
     }
-  ```
+  
+  
 
 
 ### SOCKET
@@ -69,6 +71,23 @@ $ python manage.py runserver
 - 채팅방 목록
   - /room/
 
+  - ```json
+    // visitor_count 순으로
+    {
+        "{chatroom.id}": {
+            "chatroom_id": chatroom.id,
+            "name": chatroom.name,
+            "visitor_count": 0,
+            "latest_message": {
+                "message": message.content,
+                "username": user.username,
+            },
+        },
+    }
+    ```
+  
+  - 
+  
 - 채팅
   - /room/{room_id}/chat/
 

@@ -31,12 +31,12 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
 
     async def _send_latest_msg(self):
-        last_messages = await self.get_latest_message()
+        latest_message = await self.get_latest_message()
         await self.channel_layer.group_send(
             self.room_group_name,
             {
                 "type": MessageType.SEND_CHATROOM_LIST,
-                "last_messages": last_messages,
+                "latest_message": latest_message,
             },
         )
 
@@ -76,7 +76,7 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
                     "chatroom_id": id_,
                     "name": name,
                     "visitor_count": visitor_count,
-                    "lastest_message": latest_message.get(id_),
+                    "latest_message": latest_message.get(id_),
                 },
             )
             for id_, name, visitor_count in chatrooms
