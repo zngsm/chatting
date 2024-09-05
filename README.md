@@ -72,7 +72,8 @@ $ python manage.py runserver
   - /room/
 
   - ```json
-    // visitor_count 순으로
+    // response
+    // connect시, 채팅방 목록 조회 visitor_count 순으로
     {
         "{chatroom.id}": {
             "chatroom_id": chatroom.id,
@@ -84,12 +85,50 @@ $ python manage.py runserver
             },
         },
     }
+    
+    // 채팅 업데이트시
+    {
+        "type": MessageType.UPDATE_LATEST_MSG,
+        "message": message.content,
+        "username": user.username,
+        "chatroom_id": chatroom.id,
+    }
     ```
   
-  - 
+  
   
 - 채팅
   - /room/{room_id}/chat/
+  
+  - ```json
+    // request 
+    {
+        "message": "message",
+        "username": "username",
+    }
+    
+    // response
+    // connect시, 1) 과거 메시지 최신부터 순차적으로
+    {
+        "type": MessageType.PAST_MESSAGE,
+        "message": message.content,
+        "username": message.user.username,
+    }
+    
+    // 2) 채팅방 방문 인원 응답
+    {
+        "type": MessageType.SEND_USER_COUNT,
+        "active_user_count": event["active_user_cnt"],
+    }
+    
+    // 채팅시
+    {
+        "message": event["message"],
+        "username": event["username"],
+    }
+    ```
+
+
 
 
 ## 참고사항
