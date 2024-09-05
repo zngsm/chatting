@@ -10,11 +10,10 @@ from django.db.models import (CharField, Count, F, OuterRef, Q, Subquery,
                               TextField, Value)
 from django.db.models.functions import Coalesce
 
-from chat.const import (JOIN_MSG, LEAVE_MSG, NO_MSG, SYSTEM,
-                        UNAUTHORIZED_ERROR, WEBSOCKET_ERROR)
+from chat.const import NO_MSG, SYSTEM, WEBSOCKET_ERROR
 from chat.enums import MessageType
 from chat.models import ChatRoom, ChatRoomVisit, Message
-from chat_project.helpers import SEOUL_TZ, datetime_to_str
+from chat_project.helpers import SEOUL_TZ
 
 User = get_user_model()
 
@@ -29,16 +28,6 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
 
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
-
-    async def _send_latest_msg(self):
-        latest_message = await self.get_latest_message()
-        await self.channel_layer.group_send(
-            self.room_group_name,
-            {
-                "type": MessageType.SEND_CHATROOM_LIST,
-                "latest_message": latest_message,
-            },
-        )
 
     async def update_latest_msg(self, event):
         await self.send(
@@ -68,7 +57,7 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
                 .values_list("id", "name", "recent_visitors_count")
             )
         )()
-        latest_message = await self.get_latest_message()
+        latest_message = await self._get_latest_message()
         results = OrderedDict(
             (
                 str(id_),
@@ -99,7 +88,7 @@ class ChatRoomConsumer(AsyncWebsocketConsumer):
             )
         )
 
-    async def get_latest_message(self):
+    async def _get_latest_message(self):
         latest_message_subquery = (
             Message.objects.filter(room=OuterRef("id"))
             .order_by("-created_at")
@@ -156,20 +145,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
             print(f"{WEBSOCKET_ERROR} {str(e)}")
             await self.close()
 
-    async def _get_user(self):
-        if "user" not in self.scope or not self.user.is_authenticated:
-            return await self._create_temp_user()
-        else:
-            return self.scope["user"]
-
-    def generate_unique_id(self):
-        return str(uuid.uuid4())[:8]
-
-    async def _create_temp_user(self):
-        return await database_sync_to_async(User.objects.create)(
-            username=f"{self.generate_unique_id()}", password="1234"
-        )
-
     async def disconnect(self, close_code):
         await self.channel_layer.group_discard(self.room_group_name, self.channel_name)
 
@@ -178,6 +153,20 @@ class ChatConsumer(AsyncWebsocketConsumer):
         message = data["message"]
         await self._save_and_send_chat_msg(message)
         await self._send_latest_message_for_chatroom(message)
+
+    async def _get_user(self):
+        if "user" not in self.scope or not self.user.is_authenticated:
+            return await self._create_temp_user()
+        else:
+            return self.scope["user"]
+
+    def _generate_unique_id(self):
+        return str(uuid.uuid4())[:8]
+
+    async def _create_temp_user(self):
+        return await database_sync_to_async(User.objects.create)(
+            username=f"{self._generate_unique_id()}", password="1234"
+        )
 
     async def chat_message(self, event):
         await self.send(

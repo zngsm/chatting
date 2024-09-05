@@ -1,15 +1,8 @@
-from datetime import datetime, timedelta
-
-from django.db.models import (CharField, Count, F, OuterRef, Q, Subquery,
-                              TextField, Value)
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
-from chat.enums import HttpMethod
-from chat.models import ChatRoom
 from chat.serializers import ChatRoomSeriailizer
-from chat_project.helpers import SEOUL_TZ
 
 
 def _create_chatroom(data):
