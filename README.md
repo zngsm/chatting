@@ -28,6 +28,9 @@ $ python manage.py migrate
 
 # 서버 on
 $ python manage.py runserver
+
+# test code
+$ python manage.py test
 ```
 
 
